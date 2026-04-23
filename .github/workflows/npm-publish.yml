@@ -1,47 +1,29 @@
-importers:
+name: Node.js Package
 
-  .:
-    dependencies:
-      '@mercuryworkshop/bare-mux':
-        specifier: ^2.1.7
-        version: 2.1.6
-      astring:
-        specifier: ^1.9.0
-        version: 1.9.0
-      events:
-        specifier: ^3.3.0
-        version: 3.3.0
-      idb:
-        specifier: ^8.0.2
-        version: 8.0.0
-      meriyah:
-        specifier: ^6.0.5
-        version: 6.0.2
-      parse5:
-        specifier: ^7.2.1
-        version: 7.2.0
-      set-cookie-parser:
-        specifier: ^2.7.1
-        version: 2.7.1
-    devDependencies:
-      '@eslint/eslintrc':
-        specifier: ^3.3.0
-        version: 3.1.0
-      '@eslint/js':
-        specifier: ^9.21.0
-        version: 9.13.0
-      esbuild:
-        specifier: ^0.25.0
-        version: 0.24.0
-      eslint:
-        specifier: ^9.21.0
-        version: 9.13.0
-      globals:
-        specifier: ^16.0.0
-        version: 15.11.0
-      prettier:
-        specifier: ^3.5.3
-        version: 3.3.3
-      rimraf:
-        specifier: ^6.0.1
-        version: 6.0.1
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
+
+      - run: pnpm install --no-frozen-lockfile
+      
+      - run: pnpm run build
+      
+      - run: pnpm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
